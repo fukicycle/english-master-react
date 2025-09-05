@@ -1,8 +1,6 @@
 import { useEffect, useState } from "react";
 
-const WordCard = ({ word }) => {
-  const [isMeaning, setIsMeaning] = useState(false);
-
+const WordCard = ({ word, isMeaning }) => {
   const blankExample = () => {
     if (!word) return "-";
     const length = word.Word.length;
@@ -10,16 +8,9 @@ const WordCard = ({ word }) => {
     return word.ExampleSentence.replace(word.Word, blank);
   };
 
-  const flipCard = () => {
-    if (!word) return;
-    setIsMeaning(!isMeaning);
-  };
   return (
     <>
-      <div
-        className="border-2 border-sky-400 rounded-md shadow-xl bg-gray-100 flex flex-col justify-center items-center w-full p-4 gap-4 h-72 overflow-auto"
-        onClick={flipCard}
-      >
+      <div className="border-2 border-sky-400 rounded-md shadow-xl bg-gray-100 flex flex-col justify-center items-center w-full p-4 gap-4 h-72 overflow-auto">
         {isMeaning ? (
           <>
             <p className="font-extrabold text-3xl">{word.Word}</p>

@@ -1,13 +1,15 @@
 import { child, get, getDatabase, ref } from "firebase/database";
 import { useEffect, useState } from "react";
 import { app } from "../services/firebase";
-import { LiaCheckSolid, LiaTimesSolid } from "react-icons/lia";
+import { LiaArrowRightSolid, LiaCheckSolid, LiaTimesSolid } from "react-icons/lia";
 import WordCard from "../components/WordCard";
 
 export const Study = () => {
   const [words, setWords] = useState([]);
   const [word, setWord] = useState(null);
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const [currentIndex, setCurrentIndex] = useState(-1);
+  const [isMeaning, setIsMeaning] = useState(false);
+
   useEffect(() => {
     try {
       const dbRef = ref(getDatabase(app));
@@ -28,11 +30,13 @@ export const Study = () => {
     }
   }, []);
   const goNextWord = () => {
-    if (currentIndex >= words.length) {
+    const nextIndex = currentIndex + 1;
+    if (nextIndex >= words.length) {
       return;
     }
-    setCurrentIndex(currentIndex + 1);
-    setWord(words[currentIndex]);
+    setIsMeaning(false);
+    setWord(words[nextIndex]);
+    setCurrentIndex(nextIndex);
   };
 
   return (
@@ -43,7 +47,7 @@ export const Study = () => {
             <p>
               {currentIndex + 1}/{words.length}
             </p>
-            <WordCard key={word.id} word={word} />
+            <WordCard key={word.id} word={word} isMeaning={isMeaning} />
           </>
         ) : (
           <>
@@ -56,18 +60,29 @@ export const Study = () => {
         <div>
           {word ? (
             <div className="flex gap-8 justify-center">
-              <button
-                onClick={goNextWord}
-                className="btn-icon bg-green-500 text-white"
-              >
-                <LiaCheckSolid className="size-8" />
-              </button>
-              <button
-                onClick={goNextWord}
-                className="btn-icon bg-red-500 text-white"
-              >
-                <LiaTimesSolid className="size-8" />
-              </button>
+              {isMeaning ? (
+                <>
+                  <button
+                    onClick={goNextWord}
+                    className="btn-icon bg-green-500 text-white"
+                  >
+                    <LiaCheckSolid className="size-8" />
+                  </button>
+                  <button
+                    onClick={goNextWord}
+                    className="btn-icon bg-red-500 text-white"
+                  >
+                    <LiaTimesSolid className="size-8" />
+                  </button>
+                </>
+              ) : (
+                <button
+                  className="btn-icon bg-orange-400 text-white"
+                  onClick={() => setIsMeaning(true)}
+                >
+                  <LiaArrowRightSolid className="size-8" />
+                </button>
+              )}
             </div>
           ) : (
             <p></p>
