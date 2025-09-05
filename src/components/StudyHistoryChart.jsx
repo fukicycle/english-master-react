@@ -88,10 +88,10 @@ const StudyHistoryChart = () => {
       }
     };
 
-    if (user.uid) {
+    if (user) {
       fetchLast10DaysLearningData();
     }
-  }, [user.uid]);
+  }, [user]);
 
   if (loading) {
     return <div>Loading...</div>;

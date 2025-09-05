@@ -25,6 +25,8 @@ const ProgressChart = ({ values }) => {
     setProgress(ratio);
     setCulculating(false);
   };
+
+  useEffect(() => calculateProgress, [user]);
   const backgroundColors = ["#14B8A6", "#3B82F6", "#F59E0B", "#E5E7EB"];
   const data = {
     datasets: [

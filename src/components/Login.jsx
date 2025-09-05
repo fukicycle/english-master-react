@@ -5,7 +5,7 @@ import { handleGoogleLogin, handleAnonymousLogin } from "../services/auth";
 const Login = () => {
   return (
     <>
-      <div className="bg-gray-400/50 fixed top-0 left-0 w-full h-dvh flex items-center justify-center">
+      <div className="bg-gray-400/50 fixed top-0 left-0 w-full h-dvh flex items-center justify-center z-50">
         <div className="shadow-xl rounded-xl p-4 bg-gray-50 flex items-center jusitfy-center flex-col max-w-72">
           <h1 className="text-2xl font-bold text-center">
             <p>Welcome to</p>
