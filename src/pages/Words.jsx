@@ -1,33 +1,37 @@
 import { useEffect, useState } from "react";
-import { app } from "../services/firebase";
-import { child, ref, get, getDatabase } from "firebase/database";
+import { db } from "../services/firebase";
+import { ref, get } from "firebase/database";
 
 export const Words = () => {
   const [words, setWords] = useState([]);
   const [search, setSearch] = useState("");
   useEffect(() => {
-    console.log("starting fetch...");
     try {
-      const dbRef = ref(getDatabase(app));
-      get(child(dbRef, "words")).then((snapshot) => {
-        if (snapshot.exists()) {
-          const data = snapshot.val();
-          const array = Object.entries(data).map(([key, value]) => ({
-            id: key,
-            ...value,
-          }));
-          setWords(array);
+      const getWords = async () => {
+        const wordRef = ref(db, "words");
+        try {
+          const snapshot = await get(wordRef);
+          const existsData = snapshot.val();
+          setWords(
+            Object.entries(existsData).map(([key, value]) => ({
+              id: key,
+              ...value,
+            }))
+          );
+        } catch (e) {
+          console.error(e);
         }
-      });
+      };
+      getWords();
     } catch (e) {
       console.error(e);
     }
   }, []);
   const handleOnChange = (e) => setSearch(e.target.value);
 
-  const filteringWords = words.filter((word) =>
-    word.Word.toLowerCase().includes(search.toLowerCase())
-  );
+  const filteringWords = words
+    .filter((word) => word.Word.toLowerCase().includes(search.toLowerCase()))
+    .sort((word) => word.Word);
   return (
     <>
       <div className="h-full px-2 pt-2 flex flex-col overflow-hidden">

@@ -1,6 +1,6 @@
-import { child, get, getDatabase, ref, update } from "firebase/database";
+import { get, ref, update } from "firebase/database";
 import { useEffect, useState } from "react";
-import { app, auth } from "../services/firebase";
+import { auth, db } from "../services/firebase";
 import {
   LiaArrowRightSolid,
   LiaCheckSolid,
@@ -17,7 +17,6 @@ export const Study = () => {
   useEffect(() => {
     if (!auth.currentUser) return;
     const getProgress = async () => {
-      const db = getDatabase(app);
       const indexRef = ref(
         db,
         `emr-users/${auth.currentUser.uid}/progress/currentIndex`
@@ -34,23 +33,24 @@ export const Study = () => {
   }, [words]);
 
   useEffect(() => {
-    try {
-      const dbRef = ref(getDatabase(app));
-      get(child(dbRef, "words")).then((snapshot) => {
-        if (snapshot.exists()) {
-          const data = snapshot.val();
-          const array = Object.entries(data)
+    const getWords = async () => {
+      const wordRef = ref(db, "words");
+      try {
+        const snapshot = await get(wordRef);
+        const existsData = snapshot.val();
+        setWords(
+          Object.entries(existsData)
             .map(([key, value]) => ({
               id: key,
               ...value,
             }))
-            .sort((word) => word.id);
-          setWords(array);
-        }
-      });
-    } catch (e) {
-      console.error(e);
-    }
+            .sort((word) => word.id)
+        );
+      } catch (e) {
+        console.error(e);
+      }
+    };
+    getWords();
   }, []);
   const goNextWord = () => {
     const nextIndex = currentIndex + 1;
@@ -63,8 +63,8 @@ export const Study = () => {
   };
 
   const handleWordResult = async (isCorrect) => {
+    if (!word) return;
     const userId = auth.currentUser.uid;
-    const db = getDatabase(app);
     const wordHistoryRef = ref(
       db,
       `emr-users/${userId}/wordHistories/${word.id}`
@@ -135,50 +135,46 @@ export const Study = () => {
   return (
     <>
       <div className="h-full flex justify-around items-center p-4 flex-col">
-        {word && (
-          <>
-            <p>
-              {currentIndex + 1}/{words.length}
-            </p>
-            <WordCard key={word.id} word={word} isMeaning={isMeaning} />
-          </>
+        {word ? (
+          <p className="h-6">
+            {currentIndex + 1}/{words.length}
+          </p>
+        ) : (
+          <p className="h-6 w-24 animate-pulse bg-gray-200 rounded-full"></p>
         )}
+        <WordCard key={word?.id} word={word} isMeaning={isMeaning} />
         <div>
-          {word ? (
-            <div className="flex gap-8 justify-center">
-              {isMeaning ? (
-                <>
-                  <button
-                    onClick={() => {
-                      handleWordResult(true);
-                      goNextWord();
-                    }}
-                    className="btn-icon bg-green-500 text-white"
-                  >
-                    <LiaCheckSolid className="size-8" />
-                  </button>
-                  <button
-                    onClick={() => {
-                      handleWordResult(false);
-                      goNextWord();
-                    }}
-                    className="btn-icon bg-red-500 text-white"
-                  >
-                    <LiaTimesSolid className="size-8" />
-                  </button>
-                </>
-              ) : (
+          <div className="flex gap-8 justify-center">
+            {isMeaning ? (
+              <>
                 <button
-                  className="btn-icon bg-orange-400 text-white"
-                  onClick={() => setIsMeaning(true)}
+                  onClick={() => {
+                    handleWordResult(true);
+                    goNextWord();
+                  }}
+                  className="btn-icon bg-green-500 text-white"
                 >
-                  <LiaArrowRightSolid className="size-8" />
+                  <LiaCheckSolid className="size-8" />
                 </button>
-              )}
-            </div>
-          ) : (
-            <p></p>
-          )}
+                <button
+                  onClick={() => {
+                    handleWordResult(false);
+                    goNextWord();
+                  }}
+                  className="btn-icon bg-red-500 text-white"
+                >
+                  <LiaTimesSolid className="size-8" />
+                </button>
+              </>
+            ) : (
+              <button
+                className="btn-icon bg-orange-400 text-white"
+                onClick={() => setIsMeaning(true)}
+              >
+                <LiaArrowRightSolid className="size-8" />
+              </button>
+            )}
+          </div>
         </div>
       </div>
     </>
