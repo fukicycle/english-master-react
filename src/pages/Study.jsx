@@ -1,25 +1,27 @@
 import { get, ref, update } from "firebase/database";
 import { useEffect, useState } from "react";
-import { auth, db } from "../services/firebase";
+import { db } from "../services/firebase";
 import {
   LiaArrowRightSolid,
   LiaCheckSolid,
   LiaTimesSolid,
 } from "react-icons/lia";
 import WordCard from "../components/WordCard";
+import { useAuth } from "../contexts/AuthContext";
 
 export const Study = () => {
   const [words, setWords] = useState([]);
   const [word, setWord] = useState(null);
   const [currentIndex, setCurrentIndex] = useState(-1);
   const [isMeaning, setIsMeaning] = useState(false);
+  const { user, loading } = useAuth();
 
   useEffect(() => {
-    if (!auth.currentUser) return;
+    if (!user) return;
     const getProgress = async () => {
       const indexRef = ref(
         db,
-        `emr-users/${auth.currentUser.uid}/progress/currentIndex`
+        `emr-users/${user.uid}/progress/currentIndex`
       );
       const snapshot = await get(indexRef);
       if (snapshot.val()) {
@@ -64,7 +66,7 @@ export const Study = () => {
 
   const handleWordResult = async (isCorrect) => {
     if (!word) return;
-    const userId = auth.currentUser.uid;
+    const userId = user.uid;
     const wordHistoryRef = ref(
       db,
       `emr-users/${userId}/wordHistories/${word.id}`

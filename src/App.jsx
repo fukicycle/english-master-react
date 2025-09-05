@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import { Link, Route, Routes } from "react-router-dom";
 import Home from "./pages/Home";
 import NotFound from "./pages/NotFound";
@@ -6,26 +5,12 @@ import { Study } from "./pages/Study";
 import { Words } from "./pages/Words";
 import BottomNavMenu from "./components/BottomNavMenu";
 import Login from "./components/Login";
-import { onAuthStateChanged } from "firebase/auth";
-import { auth } from "./services/firebase";
 import { LiaSignInAltSolid } from "react-icons/lia";
 import { handleLAnonymousToGoogleUser, handleLogout } from "./services/auth";
+import { useAuth } from "./contexts/AuthContext";
 
 function App() {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        setUser(user);
-      } else {
-        setUser(null);
-      }
-      setLoading(false);
-    });
-    return () => unsubscribe();
-  }, []);
-
+  const { user, loading } = useAuth();
   return (
     <>
       {loading ? (
