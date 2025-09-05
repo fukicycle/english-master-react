@@ -8,5 +8,5 @@ export default {
       JP: ["Zen Kaku Gothic New", "sans-serif"],
     },
   },
-  plugins: [],
+  plugins: [require("tailwindcss-safe-area")],
 };

@@ -28,7 +28,7 @@ function App() {
   return (
     <>
       {!user && <Login />}
-      <div className="h-dvh bg-gray-50 font-Montserrat flex flex-col">
+      <div className="h-dvh bg-gray-50 font-Montserrat flex flex-col pb-safe">
         <div className="bg-sky-500 shadow-xl p-2 flex items-center justify-between h-16">
           <Link to="/" className=" text-white text-xl text-bold">
             English Master
