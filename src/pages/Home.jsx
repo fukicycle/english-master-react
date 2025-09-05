@@ -13,7 +13,7 @@ export const Home = () => {
           Welcome back, {user?.displayName}!
         </h1>
         <div className="flex flex-col gap-2 p-2 flex-1 overflow-auto">
-          <ProgressChart values={[2, 0, 0, 540]} />
+          <ProgressChart />
           <StudyHistoryChart />
         </div>
       </div>

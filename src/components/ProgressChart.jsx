@@ -5,8 +5,9 @@ import { db } from "../services/firebase";
 import { ref, get } from "firebase/database";
 import { useAuth } from "../contexts/AuthContext";
 ChartJS.register(ArcElement, Tooltip, Legend);
-const ProgressChart = ({ values }) => {
+const ProgressChart = () => {
   const { user, loading } = useAuth();
+  const [values, setValues] = useState(null);
   const [progress, setProgress] = useState(0.0);
   const calculateProgress = async (currentUser) => {
     if (!currentUser) {
@@ -23,6 +24,51 @@ const ProgressChart = ({ values }) => {
       const wordsRef = ref(db, "words");
       const wordsSnapshot = await get(wordsRef);
       const totalWords = wordsSnapshot.size;
+
+      const wordHistoryRef = ref(
+        db,
+        `emr-users/${currentUser.uid}/wordHistories`
+      );
+      const wordHistoriesSnapshot = await get(wordHistoryRef);
+      if (!wordHistoriesSnapshot.val()) {
+        setProgress(0.0);
+        return;
+      }
+      const wordHistories = wordHistoriesSnapshot.val();
+      const difficultyCounts = {
+        easy: 0,
+        normal: 0,
+        hard: 0,
+        default: 0,
+      };
+
+      // データをループして集計
+      for (const wordId in wordHistories) {
+        const wordData = wordHistories[wordId];
+        const difficulty = wordData.difficulty;
+
+        switch (difficulty) {
+          case "easy":
+            difficultyCounts.easy++;
+            break;
+          case "normal":
+            difficultyCounts.medium++;
+            break;
+          case "hard":
+            difficultyCounts.hard++;
+            break;
+          default:
+            difficultyCounts.unclassified++;
+            break;
+        }
+      }
+      const remain = totalWords - wordHistoriesSnapshot.size;
+      setValues([
+        difficultyCounts.easy,
+        difficultyCounts.normal,
+        difficultyCounts.hard,
+        remain,
+      ]);
 
       if (progressData && totalWords > 0) {
         const ratio = Math.round(
@@ -42,7 +88,7 @@ const ProgressChart = ({ values }) => {
   // 2. useEffectを一つにまとめ、依存配列に`user`と`loading`を追加
   useEffect(() => {
     // ローディングが完了し、ユーザー情報が確定した時点で計算を実行
-    if (!loading) {
+    if (user) {
       calculateProgress(user);
     }
   }, [user, loading]);
