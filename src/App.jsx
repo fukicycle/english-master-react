@@ -9,10 +9,11 @@ import Login from "./components/Login";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "./services/firebase";
 import { LiaSignInAltSolid } from "react-icons/lia";
-import { handleLAnonymousToGoogleUser,handleLogout } from "./services/auth";
+import { handleLAnonymousToGoogleUser, handleLogout } from "./services/auth";
 
 function App() {
   const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
@@ -20,14 +21,20 @@ function App() {
       } else {
         setUser(null);
       }
+      setLoading(false);
     });
-
     return () => unsubscribe();
   }, []);
 
   return (
     <>
-      {!user && <Login />}
+      {loading ? (
+        <div className="fixed top-0 left-0 w-full h-dvh flex justify-center items-center bg-gray-400/50">
+          <div className="loader"></div>
+        </div>
+      ) : (
+        !user && <Login />
+      )}
       <div className="h-dvh bg-gray-50 font-Montserrat flex flex-col pb-safe">
         <div className="bg-sky-500 shadow-xl p-2 flex items-center justify-between h-16">
           <Link to="/" className=" text-white text-xl text-bold">
