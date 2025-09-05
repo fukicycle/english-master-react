@@ -1,0 +1,1 @@
+if('serviceWorker' in navigator) {window.addEventListener('load', () => {navigator.serviceWorker.register('/english-master-react/sw.js', { scope: '/english-master-react/' })})}
