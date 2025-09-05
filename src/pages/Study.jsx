@@ -15,6 +15,25 @@ export const Study = () => {
   const [isMeaning, setIsMeaning] = useState(false);
 
   useEffect(() => {
+    if (!auth.currentUser) return;
+    const getProgress = async () => {
+      const db = getDatabase(app);
+      const indexRef = ref(
+        db,
+        `emr-users/${auth.currentUser.uid}/progress/currentIndex`
+      );
+      const snapshot = await get(indexRef);
+      if (snapshot.val()) {
+        setCurrentIndex(snapshot.val());
+      } else {
+        setCurrentIndex(0);
+      }
+      setWord(words[currentIndex]);
+    };
+    getProgress();
+  }, [words]);
+
+  useEffect(() => {
     try {
       const dbRef = ref(getDatabase(app));
       get(child(dbRef, "words")).then((snapshot) => {
@@ -74,6 +93,25 @@ export const Study = () => {
     } catch (e) {
       console.error(e);
     }
+
+    const progressRef = ref(db, `emr-users/${userId}/progress`);
+    try {
+      const snapshot = await get(progressRef);
+      const existsData = snapshot.val() || {
+        repeat: 0,
+        currentIndex: 0,
+      };
+
+      const isNext = currentIndex == words.length;
+      const updateData = {
+        repeat: isNext ? existsData.repeat + 1 : existsData.repeat,
+        currentIndex: currentIndex + 1,
+      };
+
+      await update(progressRef, updateData);
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   const calculateDifficulty = (data, isCorrect) => {
@@ -97,19 +135,12 @@ export const Study = () => {
   return (
     <>
       <div className="h-full flex justify-around items-center p-4 flex-col">
-        {word ? (
+        {word && (
           <>
             <p>
               {currentIndex + 1}/{words.length}
             </p>
             <WordCard key={word.id} word={word} isMeaning={isMeaning} />
-          </>
-        ) : (
-          <>
-            <p></p>
-            <button className="btn-primary" onClick={goNextWord}>
-              Let's study English!
-            </button>
           </>
         )}
         <div>
