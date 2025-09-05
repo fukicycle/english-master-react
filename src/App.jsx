@@ -8,6 +8,8 @@ import BottomNavMenu from "./components/BottomNavMenu";
 import Login from "./components/Login";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "./services/firebase";
+import { LiaSignInAltSolid } from "react-icons/lia";
+import { handleLAnonymousToGoogleUser,handleLogout } from "./services/auth";
 
 function App() {
   const [user, setUser] = useState(null);
@@ -23,13 +25,6 @@ function App() {
     return () => unsubscribe();
   }, []);
 
-  const handleLogout = () => {
-    try {
-      auth.signOut();
-    } catch (e) {
-      console.error(e);
-    }
-  };
   return (
     <>
       {!user && <Login />}
@@ -38,12 +33,16 @@ function App() {
           <Link to="/" className=" text-white text-xl text-bold">
             English Master
           </Link>
-          {user && (
+          {user && !user.isAnonymous ? (
             <img
               src={user.photoURL}
               className="rounded-full h-full shadow-md"
               onClick={handleLogout}
             />
+          ) : (
+            <button className="btn-icon" onClick={handleLAnonymousToGoogleUser}>
+              <LiaSignInAltSolid className="size-8" />
+            </button>
           )}
         </div>
         <div className="flex-1 overflow-hidden">

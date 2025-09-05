@@ -10,6 +10,10 @@
     @apply text-lg flex gap-4 w-full rounded-full shadow-md font-semibold text-white bg-orange-400 px-4 py-2 justify-center items-center;
   }
 
+  .btn-secondary {
+    @apply text-lg flex gap-4 w-full rounded-full shadow-md text-white bg-gray-400 px-4 py-2 justify-center items-center;
+  }
+
   .btn-icon {
     @apply flex items-center justify-center shadow-md rounded-full p-2;
   }
@@ -26,6 +30,7 @@
   position: relative;
   animation: l24 1s infinite linear;
 }
+
 .loader:before,
 .loader:after {
   content: "";
@@ -36,9 +41,13 @@
   animation: inherit;
   animation-duration: 2s;
 }
+
 .loader:after {
   animation-duration: 4s;
 }
+
 @keyframes l24 {
-  100% {transform: rotate(1turn)}
+  100% {
+    transform: rotate(1turn)
+  }
 }

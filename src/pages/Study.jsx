@@ -49,7 +49,7 @@ export const Study = () => {
           <>
             <p></p>
             <button className="btn-primary" onClick={goNextWord}>
-              Let's start study!
+              Let's study English!
             </button>
           </>
         )}
