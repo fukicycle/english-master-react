@@ -2,31 +2,50 @@ import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import { Doughnut } from "react-chartjs-2";
 import { useState, useEffect } from "react";
 import { db } from "../services/firebase";
-import { ref,get } from "firebase/database";
+import { ref, get } from "firebase/database";
 import { useAuth } from "../contexts/AuthContext";
 ChartJS.register(ArcElement, Tooltip, Legend);
 const ProgressChart = ({ values }) => {
   const { user, loading } = useAuth();
   const [progress, setProgress] = useState(0.0);
-  const [calculating, setCulculating] = useState(true);
-  const getWordCount = async () => {
-    const wordsRef = ref(db, "words");
-    const snapshot = await get(wordsRef);
-    return snapshot.size;
-  };
-  const calculateProgress = async () => {
-    if (!user) return 0.0;
-    setCulculating(true);
-    const progressRef = ref(db, `emr-users/${user.uid}/progress`);
-    const snapshot = await get(progressRef);
-    const progress = snapshot.val();
-    const size = await getWordCount();
-    const ratio = Math.round((progress.currentIndex / size) * 100.0);
-    setProgress(ratio);
-    setCulculating(false);
+  const calculateProgress = async (currentUser) => {
+    if (!currentUser) {
+      setProgress(0.0);
+      setCalculating(false);
+      return;
+    }
+
+    try {
+      const progressRef = ref(db, `emr-users/${currentUser.uid}/progress`);
+      const progressSnapshot = await get(progressRef);
+      const progressData = progressSnapshot.val();
+
+      const wordsRef = ref(db, "words");
+      const wordsSnapshot = await get(wordsRef);
+      const totalWords = wordsSnapshot.size;
+
+      if (progressData && totalWords > 0) {
+        const ratio = Math.round(
+          (progressData.currentIndex / totalWords) * 100.0
+        );
+        setProgress(ratio);
+      } else {
+        // データが存在しない場合のデフォルト値
+        setProgress(0.0);
+      }
+    } catch (e) {
+      console.error("Error calculating progress:", e);
+      setProgress(0.0);
+    }
   };
 
-  useEffect(() => calculateProgress, [user]);
+  // 2. useEffectを一つにまとめ、依存配列に`user`と`loading`を追加
+  useEffect(() => {
+    // ローディングが完了し、ユーザー情報が確定した時点で計算を実行
+    if (!loading) {
+      calculateProgress(user);
+    }
+  }, [user, loading]);
   const backgroundColors = ["#14B8A6", "#3B82F6", "#F59E0B", "#E5E7EB"];
   const data = {
     datasets: [
@@ -38,7 +57,6 @@ const ProgressChart = ({ values }) => {
       },
     ],
   };
-  useEffect(() => calculateProgress, []);
 
   return (
     <>
