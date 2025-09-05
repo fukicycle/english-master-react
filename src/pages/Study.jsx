@@ -1,7 +1,11 @@
-import { child, get, getDatabase, ref } from "firebase/database";
+import { child, get, getDatabase, ref, update } from "firebase/database";
 import { useEffect, useState } from "react";
-import { app } from "../services/firebase";
-import { LiaArrowRightSolid, LiaCheckSolid, LiaTimesSolid } from "react-icons/lia";
+import { app, auth } from "../services/firebase";
+import {
+  LiaArrowRightSolid,
+  LiaCheckSolid,
+  LiaTimesSolid,
+} from "react-icons/lia";
 import WordCard from "../components/WordCard";
 
 export const Study = () => {
@@ -39,6 +43,57 @@ export const Study = () => {
     setCurrentIndex(nextIndex);
   };
 
+  const handleWordResult = async (isCorrect) => {
+    const userId = auth.currentUser.uid;
+    const db = getDatabase(app);
+    const wordHistoryRef = ref(
+      db,
+      `emr-users/${userId}/wordHistories/${word.id}`
+    );
+
+    try {
+      const snapshot = await get(wordHistoryRef);
+      const existsData = snapshot.val() || {
+        correctCount: 0,
+        incorrectCount: 0,
+        difficulty: "new",
+      };
+
+      const updateData = {
+        correctCount: isCorrect
+          ? existsData.correctCount + 1
+          : existsData.correctCount,
+        incorrectCount: isCorrect
+          ? existsData.incorrectCount
+          : existsData.incorrectCount + 1,
+        lastReviewed: new Date().toISOString(),
+        difficulty: calculateDifficulty(existsData, isCorrect),
+      };
+
+      await update(wordHistoryRef, updateData);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const calculateDifficulty = (data, isCorrect) => {
+    const newCorrectCount = isCorrect
+      ? data.correctCount + 1
+      : data.correctCount;
+    const newIncorrectCount = isCorrect
+      ? data.incorrectCount
+      : data.incorrectCount + 1;
+    const difficulty = ["easy", "normal", "hard"];
+    //正答率が80％以上 -> easy
+    //正答率が30%以下 -> hard
+    //それ以外 -> normal
+    const correctAnswerRatio =
+      newCorrectCount / (newCorrectCount + newIncorrectCount - 1);
+    if (correctAnswerRatio >= 0.8) return difficulty[0];
+    if (correctAnswerRatio <= 0.3) return difficulty[2];
+    return difficulty[1];
+  };
+
   return (
     <>
       <div className="h-full flex justify-around items-center p-4 flex-col">
@@ -63,13 +118,19 @@ export const Study = () => {
               {isMeaning ? (
                 <>
                   <button
-                    onClick={goNextWord}
+                    onClick={() => {
+                      handleWordResult(true);
+                      goNextWord();
+                    }}
                     className="btn-icon bg-green-500 text-white"
                   >
                     <LiaCheckSolid className="size-8" />
                   </button>
                   <button
-                    onClick={goNextWord}
+                    onClick={() => {
+                      handleWordResult(false);
+                      goNextWord();
+                    }}
                     className="btn-icon bg-red-500 text-white"
                   >
                     <LiaTimesSolid className="size-8" />
