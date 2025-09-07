@@ -52,13 +52,13 @@ const ProgressChart = () => {
             difficultyCounts.easy++;
             break;
           case "normal":
-            difficultyCounts.medium++;
+            difficultyCounts.normal++;
             break;
           case "hard":
             difficultyCounts.hard++;
             break;
           default:
-            difficultyCounts.unclassified++;
+            difficultyCounts.default++;
             break;
         }
       }
