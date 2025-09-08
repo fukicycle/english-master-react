@@ -7,7 +7,8 @@ export default function StreakWidget({ streakCount, dailyActivity }) {
     <div className="flex flex-col items-center gap-8 w-full">
       {/* 連続日数 */}
       <div className="text-6xl font-extrabold text-[var(--color-accent)]">
-        {streakCount}Days
+        {streakCount}
+        {streakCount <= 1 ? "Day" : "Days"}
       </div>
       <div className="text-gray-600 font-JP">連続学習中</div>
 

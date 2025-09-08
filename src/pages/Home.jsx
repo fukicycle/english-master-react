@@ -14,7 +14,7 @@ export const Home = () => {
       if (user) {
         const streakRef = ref(db, `emr-users/${user.uid}/progress/streak`);
         const snapshot = await get(streakRef);
-        const streak = snapshot.val() || 1;
+        const streak = snapshot.val() || 0;
         setStreak(streak);
       }
     };

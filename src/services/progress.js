@@ -1,9 +1,10 @@
 import { ref, runTransaction, get } from "firebase/database";
 import { db } from "./firebase";
+import { DateTime, Duration } from "luxon";
 
-const todayKey = new Date().toISOString().split("T")[0]; // "2025-09-05"
 
 export async function updateProgressOnStudy(userId, nextIndex) {
+  const todayKey = DateTime.now().setZone("Asia/Tokyo").toFormat("yyyy-MM-dd");
   const progressRef = ref(db, `emr-users/${userId}/progress`);
 
   await runTransaction(progressRef, (progress) => {
@@ -36,9 +37,8 @@ export async function updateProgressOnStudy(userId, nextIndex) {
     }
 
     // 昨日の日付を計算
-    const yesterday = new Date();
-    yesterday.setDate(yesterday.getDate() - 1);
-    const yesterdayKey = yesterday.toISOString().split("T")[0];
+    const yesterday = DateTime.now().setZone("Asia/Tokyo").minus({ days: 1 });
+    const yesterdayKey = yesterday.toFormat("yyyy-MM-dd");
 
     let newStreak = 1;
 
@@ -69,9 +69,8 @@ export async function checkLast7Days(userId) {
 
   const results = {};
   for (let i = 6; i >= 0; i--) {
-    const d = new Date();
-    d.setDate(d.getDate() - i);
-    const key = d.toISOString().split("T")[0]; // yyyy-MM-dd
+    const d = DateTime.now().setZone("Asia/Tokyo");
+    const key = d.minus({ days: i }).toFormat("yyyy-MM-dd"); // yyyy-MM-dd
     results[key] = data[key] === true; // undefined → false
   }
 

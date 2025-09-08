@@ -11,6 +11,7 @@ import { useAuth } from "../contexts/AuthContext";
 import { useTheme } from "../contexts/ThemeContext";
 import { getLevelWithRepeatNumber } from "../services/level";
 import { updateProgressOnStudy } from "../services/progress";
+import { DateTime } from "luxon";
 
 export const Study = () => {
   const [words, setWords] = useState([]);
@@ -105,7 +106,7 @@ export const Study = () => {
         incorrectCount: isCorrect
           ? existsData.incorrectCount
           : existsData.incorrectCount + 1,
-        lastReviewed: new Date().toISOString(),
+        lastReviewed: DateTime.now().setZone("Asia/Tokyo"),
         difficulty: calculateDifficulty(existsData, isCorrect),
       };
 
