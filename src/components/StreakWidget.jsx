@@ -33,7 +33,7 @@ export default function StreakWidget({ streakCount, dailyActivity }) {
             {dummy.map((data, idx) => (
               <div
                 key={idx}
-                className="w-6 h-6 rounded animation-pulse bg-gray-200"
+                className="w-8 h-8 rounded animation-pulse bg-gray-200"
               ></div>
             ))}
           </>
