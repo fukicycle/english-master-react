@@ -8,6 +8,8 @@ import {
 } from "react-icons/lia";
 import WordCard from "../components/WordCard";
 import { useAuth } from "../contexts/AuthContext";
+import { useTheme } from "../contexts/ThemeContext";
+import { getLevelWithRepeatNumber } from "../services/level";
 
 export const Study = () => {
   const [words, setWords] = useState([]);
@@ -15,6 +17,12 @@ export const Study = () => {
   const [currentIndex, setCurrentIndex] = useState(-1);
   const [isMeaning, setIsMeaning] = useState(false);
   const { user, loading } = useAuth();
+  const { theme, setTheme } = useTheme();
+  const setLevelWithRepeatNumber = (repeat) => {
+    const level = getLevelWithRepeatNumber(repeat);
+    setTheme(level);
+    localStorage.setItem("level", level);
+  };
 
   useEffect(() => {
     if (!user) return;
@@ -52,7 +60,7 @@ export const Study = () => {
     getWords();
   }, []);
   const goNextWord = () => {
-    const nextIndex = currentIndex + 1;
+    let nextIndex = currentIndex + 1;
     if (nextIndex >= words.length) {
       nextRound();
       nextIndex = 0;
@@ -68,7 +76,9 @@ export const Study = () => {
       const progressRepeatRef = ref(db, `emr-users/${userId}/progress/repeat`);
       const snapshot = await get(progressRepeatRef);
       const repeat = snapshot.val() || 0;
-      await update(progressRepeatRef, repeat + 1);
+      const newRepeat = repeat + 1;
+      await update(progressRepeatRef, newRepeat);
+      setLevelWithRepeatNumber(newRepeat);
     } catch (e) {
       console.error(e);
     }

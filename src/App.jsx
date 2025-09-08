@@ -8,9 +8,38 @@ import Login from "./components/Login";
 import { LiaSignInAltSolid } from "react-icons/lia";
 import { handleLAnonymousToGoogleUser, handleLogout } from "./services/auth";
 import { useAuth } from "./contexts/AuthContext";
+import { useEffect } from "react";
+import { useTheme } from "./contexts/ThemeContext";
+import { getLevelWithRepeatNumber } from "./services/level";
+import { ref, get } from "firebase/database";
+import { db } from "./services/firebase";
 
 function App() {
   const { user, loading } = useAuth();
+  const { theme, setTheme } = useTheme();
+
+  const setThemeFromDatabase = async () => {
+    try {
+      const userId = user.uid;
+      const progressRepeatRef = ref(db, `emr-users/${userId}/progress/repeat`);
+      const snapshot = await get(progressRepeatRef);
+      const repeat = snapshot.val() || 0;
+      const level = getLevelWithRepeatNumber(repeat);
+      setTheme(level);
+      localStorage.setItem("level", level);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+  useEffect(() => {
+    const level = localStorage.getItem("level");
+    if (level) {
+      setTheme(level);
+    } else {
+      setThemeFromDatabase();
+    }
+  });
+
   return (
     <>
       {loading ? (
