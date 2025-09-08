@@ -1,4 +1,4 @@
-import { FaHome } from "react-icons/fa";
+import { FaChartPie, FaHome } from "react-icons/fa";
 import { FaTags } from "react-icons/fa";
 import { FaListUl } from "react-icons/fa";
 import { Link } from "react-router-dom";
@@ -32,6 +32,15 @@ export const BottomNavMenu = () => {
             >
               <FaListUl className="size-6" />
               <p className="text-xs">Words</p>
+            </Link>
+          </li>
+          <li>
+            <Link
+              to="/charts"
+              className="flex flex-col items-center justify-center p-2 gap-2"
+            >
+              <FaChartPie className="size-6" />
+              <p className="text-xs">Charts</p>
             </Link>
           </li>
         </ul>
