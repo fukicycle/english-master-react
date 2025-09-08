@@ -156,7 +156,7 @@ export const Study = () => {
         )}
         <WordCard key={word?.id} word={word} isMeaning={isMeaning} />
         <div>
-          <div className="flex gap-8 justify-center">
+          <div className="flex gap-12 justify-center">
             {isMeaning ? (
               <>
                 <button
@@ -166,7 +166,7 @@ export const Study = () => {
                   }}
                   className="btn-icon bg-green-500 text-white"
                 >
-                  <LiaCheckSolid className="size-8" />
+                  <LiaCheckSolid className="size-12" />
                 </button>
                 <button
                   onClick={() => {
@@ -175,15 +175,15 @@ export const Study = () => {
                   }}
                   className="btn-icon bg-red-500 text-white"
                 >
-                  <LiaTimesSolid className="size-8" />
+                  <LiaTimesSolid className="size-12" />
                 </button>
               </>
             ) : (
               <button
-                className="btn-icon bg-orange-400 text-white"
+                className="btn-icon bg-[var(--color-accent)] text-white"
                 onClick={() => setIsMeaning(true)}
               >
-                <LiaArrowRightSolid className="size-8" />
+                <LiaArrowRightSolid className="size-12" />
               </button>
             )}
           </div>

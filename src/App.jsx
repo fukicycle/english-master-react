@@ -15,13 +15,13 @@ function App() {
     <>
       {loading ? (
         <div className="fixed top-0 left-0 w-full h-dvh flex justify-center items-center bg-gray-400/50">
-          <div className="loader"></div>
+          <div className="loader border-r-2 border-2 border-transparent border-r-[var(--color-accent)]"></div>
         </div>
       ) : (
         !user && <Login />
       )}
-      <div className="h-dvh bg-gray-50 font-Montserrat flex flex-col pb-safe">
-        <div className="bg-sky-500 shadow-xl p-2 flex items-center justify-between h-16">
+      <div className="h-full bg-[var(--color-bg)] text-[var(--color-text)] font-Montserrat flex flex-col pb-safe">
+        <div className="bg-[var(--color-accent)] shadow-xl p-2 flex items-center justify-between h-16">
           <Link to="/" className=" text-white text-xl text-bold">
             English Master
           </Link>

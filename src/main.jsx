@@ -4,13 +4,16 @@ import "./index.css";
 import App from "./App.jsx";
 import { BrowserRouter } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext.jsx";
+import { ThemeProvider } from "./contexts/ThemeContext.jsx";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <AuthProvider>
-      <BrowserRouter basename="/english-master-react/">
-        <App />
-      </BrowserRouter>
+      <ThemeProvider>
+        <BrowserRouter basename="/english-master-react/">
+          <App />
+        </BrowserRouter>
+      </ThemeProvider>
     </AuthProvider>
   </StrictMode>
 );

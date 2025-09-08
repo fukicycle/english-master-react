@@ -38,11 +38,11 @@ export const Words = () => {
         <input
           onChange={handleOnChange}
           value={search}
-          className="rounded-full p-2 border border-orange-400 shadow"
+          className="rounded-full p-2 border border-[var(--color-accent)] shadow"
         />
         {words.length == 0 ? (
           <div className="flex-1 flex items-center justify-center">
-            <div className="loader"></div>
+            <div className="loader border-r-2 border-2 border-transparent border-r-[var(--color-accent)]"></div>
           </div>
         ) : (
           <div className="overflow-y-auto flex-1">

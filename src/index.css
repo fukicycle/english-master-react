@@ -7,7 +7,7 @@
 
 @layer components {
   .btn-primary {
-    @apply text-lg flex gap-4 w-full rounded-full shadow-md font-semibold text-white bg-orange-400 px-4 py-2 justify-center items-center;
+    @apply text-lg flex gap-4 w-full rounded-full shadow-md font-semibold text-white bg-[var(--color-accent)] px-4 py-2 justify-center items-center;
   }
 
   .btn-secondary {
@@ -19,14 +19,36 @@
   }
 }
 
+/* レベルごとのテーマカラー */
+[data-theme="level1"] {
+  --color-bg: theme(colors.gray.50);
+  --color-text: theme(colors.neutral.950);
+  --color-accent: theme(colors.emerald.500);
+}
+
+[data-theme="level2"] {
+  --color-bg: theme(colors.gray.50);
+  --color-text: theme(colors.neutral.950);
+  --color-accent: theme(colors.sky.500);
+}
+
+[data-theme="level3"] {
+  --color-bg: theme(colors.gray.50);
+  --color-text: theme(colors.neutral.950);
+  --color-accent: theme(colors.purple.500);
+}
+
+* {
+  outline: none;
+}
 
 /* HTML: <div class="loader"></div> */
 .loader {
   width: 50px;
   aspect-ratio: 1;
   border-radius: 50%;
-  border: 2px solid #0000;
-  border-right-color: #fb923c;
+  /* border: 2px solid #0000; */
+  /* border-right-color: #fb923c; */
   position: relative;
   animation: l24 1s infinite linear;
 }

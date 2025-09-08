@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 export const BottomNavMenu = () => {
   return (
     <>
-      <nav className="border-t border-sky-500">
+      <nav className="border-t border-[var(--color-accent)]">
         <ul className="flex justify-around">
           <li>
             <Link

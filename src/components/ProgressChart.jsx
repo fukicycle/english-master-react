@@ -72,7 +72,7 @@ const ProgressChart = () => {
 
       if (progressData && totalWords > 0) {
         const ratio = Math.round(
-          (progressData.currentIndex + 1 / totalWords) * 100.0
+          ((progressData.currentIndex + 1) / totalWords) * 100.0
         );
         setProgress(ratio);
       } else {
