@@ -19,10 +19,7 @@ export const Study = () => {
   useEffect(() => {
     if (!user) return;
     const getProgress = async () => {
-      const indexRef = ref(
-        db,
-        `emr-users/${user.uid}/progress/currentIndex`
-      );
+      const indexRef = ref(db, `emr-users/${user.uid}/progress/currentIndex`);
       const snapshot = await get(indexRef);
       if (snapshot.val()) {
         setCurrentIndex(snapshot.val());
@@ -57,11 +54,24 @@ export const Study = () => {
   const goNextWord = () => {
     const nextIndex = currentIndex + 1;
     if (nextIndex >= words.length) {
-      return;
+      nextRound();
+      nextIndex = 0;
     }
     setIsMeaning(false);
     setWord(words[nextIndex]);
     setCurrentIndex(nextIndex);
+  };
+
+  const nextRound = async () => {
+    try {
+      const userId = user.uid;
+      const progressRepeatRef = ref(db, `emr-users/${userId}/progress/repeat`);
+      const snapshot = await get(progressRepeatRef);
+      const repeat = snapshot.val() || 0;
+      await update(progressRepeatRef, repeat + 1);
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   const handleWordResult = async (isCorrect) => {
@@ -128,7 +138,7 @@ export const Study = () => {
     //正答率が30%以下 -> hard
     //それ以外 -> normal
     const correctAnswerRatio =
-      newCorrectCount / (newCorrectCount + newIncorrectCount - 1);
+      newCorrectCount / (newCorrectCount + newIncorrectCount);
     if (correctAnswerRatio >= 0.8) return difficulty[0];
     if (correctAnswerRatio <= 0.3) return difficulty[2];
     return difficulty[1];
