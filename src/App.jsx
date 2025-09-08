@@ -13,6 +13,7 @@ import { useTheme } from "./contexts/ThemeContext";
 import { getLevelWithRepeatNumber } from "./services/level";
 import { ref, get } from "firebase/database";
 import { db } from "./services/firebase";
+import ThemeWatcher from "./components/ThemeWather";
 
 function App() {
   const { user, loading } = useAuth();
@@ -42,6 +43,7 @@ function App() {
 
   return (
     <>
+      <ThemeWatcher/>
       {loading ? (
         <div className="fixed top-0 left-0 w-full h-dvh flex justify-center items-center bg-gray-400/50">
           <div className="loader border-r-2 border-2 border-transparent border-r-[var(--color-accent)]"></div>
