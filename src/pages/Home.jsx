@@ -1,8 +1,32 @@
 import { useAuth } from "../contexts/AuthContext";
 import StreakWidget from "../components/StreakWidget";
+import { useEffect, useState } from "react";
+import { get, ref } from "firebase/database";
+import { db } from "../services/firebase";
+import { checkLast7Days } from "../services/progress";
 
 export const Home = () => {
   const { user, loading } = useAuth();
+  const [streak, setStreak] = useState(1);
+  const [dailyActivity, setDailyActivity] = useState(null);
+  useEffect(() => {
+    const getDaysInStudy = async () => {
+      if (user) {
+        const streakRef = ref(db, `emr-users/${user.uid}/progress/streak`);
+        const snapshot = await get(streakRef);
+        const streak = snapshot.val() || 1;
+        setStreak(streak);
+      }
+    };
+    const getDailyActivity = async () => {
+      if (user) {
+        const dailyAcitivity = await checkLast7Days(user.uid);
+        setDailyActivity(dailyAcitivity);
+      }
+    };
+    getDailyActivity();
+    getDaysInStudy();
+  }, [user]);
   return (
     <>
       <div className="p-4 flex flex-col items-center h-full">
@@ -10,7 +34,7 @@ export const Home = () => {
           Welcome back, {user?.displayName}!
         </h1>
         <div className="flex gap-2 p-2 flex-1 items-center w-full overflow-x-hidden">
-          <StreakWidget streakCount={400} />
+          <StreakWidget streakCount={streak} dailyActivity={dailyActivity} />
         </div>
       </div>
     </>

@@ -10,6 +10,7 @@ import WordCard from "../components/WordCard";
 import { useAuth } from "../contexts/AuthContext";
 import { useTheme } from "../contexts/ThemeContext";
 import { getLevelWithRepeatNumber } from "../services/level";
+import { updateProgressOnStudy } from "../services/progress";
 
 export const Study = () => {
   const [words, setWords] = useState([]);
@@ -59,17 +60,6 @@ export const Study = () => {
     };
     getWords();
   }, []);
-  const goNextWord = () => {
-    let nextIndex = currentIndex + 1;
-    if (nextIndex >= words.length) {
-      nextRound();
-      nextIndex = 0;
-    }
-    setIsMeaning(false);
-    setWord(words[nextIndex]);
-    setCurrentIndex(nextIndex);
-  };
-
   const nextRound = async () => {
     try {
       const userId = user.uid;
@@ -87,6 +77,14 @@ export const Study = () => {
   const handleWordResult = async (isCorrect) => {
     if (!word) return;
     const userId = user.uid;
+    let nextIndex = currentIndex + 1;
+    if (nextIndex >= words.length) {
+      nextRound();
+      nextIndex = 0;
+    }
+    setIsMeaning(false);
+    setWord(words[nextIndex]);
+    setCurrentIndex(nextIndex);
     const wordHistoryRef = ref(
       db,
       `emr-users/${userId}/wordHistories/${word.id}`
@@ -115,25 +113,7 @@ export const Study = () => {
     } catch (e) {
       console.error(e);
     }
-
-    const progressRef = ref(db, `emr-users/${userId}/progress`);
-    try {
-      const snapshot = await get(progressRef);
-      const existsData = snapshot.val() || {
-        repeat: 0,
-        currentIndex: 0,
-      };
-
-      const isNext = currentIndex == words.length;
-      const updateData = {
-        repeat: isNext ? existsData.repeat + 1 : existsData.repeat,
-        currentIndex: currentIndex + 1,
-      };
-
-      await update(progressRef, updateData);
-    } catch (e) {
-      console.error(e);
-    }
+    await updateProgressOnStudy(userId, nextIndex);
   };
 
   const calculateDifficulty = (data, isCorrect) => {
@@ -170,19 +150,13 @@ export const Study = () => {
             {isMeaning ? (
               <>
                 <button
-                  onClick={() => {
-                    handleWordResult(true);
-                    goNextWord();
-                  }}
+                  onClick={() => handleWordResult(true)}
                   className="btn-icon bg-green-500 text-white"
                 >
                   <LiaCheckSolid className="size-12" />
                 </button>
                 <button
-                  onClick={() => {
-                    handleWordResult(false);
-                    goNextWord();
-                  }}
+                  onClick={() => handleWordResult(false)}
                   className="btn-icon bg-red-500 text-white"
                 >
                   <LiaTimesSolid className="size-12" />

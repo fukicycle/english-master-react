@@ -1,16 +1,8 @@
+import { useEffect, useState } from "react";
 import StreakBadgeCarousel from "../components/StreakBadgeCarousel";
-// ダミーデータ
-const days = [
-  { date: "Mon", studied: true },
-  { date: "Tue", studied: true },
-  { date: "Wed", studied: true },
-  { date: "Thu", studied: true },
-  { date: "Fri", studied: true },
-  { date: "Sat", studied: false },
-  { date: "Sun", studied: false },
-];
 
-export default function StreakWidget({ streakCount = 4 }) {
+export default function StreakWidget({ streakCount, dailyActivity }) {
+  const dummy = [1, 2, 3, 4, 5, 6, 7];
   return (
     <div className="flex flex-col items-center gap-8 w-full">
       {/* 連続日数 */}
@@ -20,16 +12,32 @@ export default function StreakWidget({ streakCount = 4 }) {
       <div className="text-gray-600 font-JP">連続学習中</div>
 
       {/* 7日間ブロック */}
-      <div className="flex gap-1">
-        {days.map((day, idx) => (
-          <div
-            key={idx}
-            className={`w-6 h-6 rounded transition-colors duration-300 ${
-              day.studied ? "bg-[var(--color-accent)]" : "bg-gray-300"
-            }`}
-            title={day.date}
-          ></div>
-        ))}
+      <div className="flex gap-2">
+        {dailyActivity ? (
+          <>
+            {Object.entries(dailyActivity).map(([date, studied]) => (
+              <div key={date} className="flex flex-col gap-2">
+                <div
+                  className={`w-8 h-8 rounded transition-colors duration-300 ${
+                    studied ? "bg-[var(--color-accent)]" : "bg-gray-300"
+                  }`}
+                ></div>
+                <p className="text-center text-xs">
+                  {new Date(date).toDateString().slice(0, 3)}
+                </p>
+              </div>
+            ))}
+          </>
+        ) : (
+          <>
+            {dummy.map((data, idx) => (
+              <div
+                key={idx}
+                className="w-6 h-6 rounded animation-pulse bg-gray-200"
+              ></div>
+            ))}
+          </>
+        )}
       </div>
       <StreakBadgeCarousel streakCount={streakCount} />
     </div>
