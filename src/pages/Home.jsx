@@ -4,11 +4,13 @@ import { useEffect, useState } from "react";
 import { get, ref } from "firebase/database";
 import { db } from "../services/firebase";
 import { checkLast7Days } from "../services/progress";
+import Modal from "../components/Modal";
 
 export const Home = () => {
   const { user, loading } = useAuth();
   const [streak, setStreak] = useState(1);
   const [dailyActivity, setDailyActivity] = useState(null);
+  const [isShow, setIsShow] = useState(true);
   useEffect(() => {
     const getDaysInStudy = async () => {
       if (user) {
@@ -37,6 +39,8 @@ export const Home = () => {
           <StreakWidget streakCount={streak} dailyActivity={dailyActivity} />
         </div>
       </div>
+      <Modal isShow={isShow} setIsShow={setIsShow}>
+      </Modal>
     </>
   );
 };
