@@ -23,7 +23,7 @@ export default function StreakWidget({ streakCount, dailyActivity }) {
                     studied ? "bg-[var(--color-accent)]" : "bg-gray-300"
                   }`}
                 ></div>
-                <p className="text-center text-xs">
+                <p className="text-center text-xs h-4">
                   {new Date(date).toDateString().slice(0, 3)}
                 </p>
               </div>
@@ -32,10 +32,10 @@ export default function StreakWidget({ streakCount, dailyActivity }) {
         ) : (
           <>
             {dummy.map((data, idx) => (
-              <div
-                key={idx}
-                className="w-8 h-8 rounded animation-pulse bg-gray-200"
-              ></div>
+              <div key={idx} className="flex flex-col gap-2">
+                <div className="w-8 h-8 rounded animation-pulse bg-gray-200"></div>
+                <p className="h-4 bg-gray-200 animation-pulse rounded-xl"></p>
+              </div>
             ))}
           </>
         )}

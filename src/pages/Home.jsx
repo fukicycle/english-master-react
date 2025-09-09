@@ -1,16 +1,19 @@
 import { useAuth } from "../contexts/AuthContext";
 import StreakWidget from "../components/StreakWidget";
 import { useEffect, useState } from "react";
-import { get, ref } from "firebase/database";
+import { get, ref, set, update } from "firebase/database";
 import { db } from "../services/firebase";
 import { checkLast7Days } from "../services/progress";
 import Modal from "../components/Modal";
+import StreakBadgesLightFixed from "../components/StreakBadgesLightFixed";
+import Cracker from "../components/Cracker";
 
 export const Home = () => {
   const { user, loading } = useAuth();
-  const [streak, setStreak] = useState(1);
+  const [streak, setStreak] = useState(null);
   const [dailyActivity, setDailyActivity] = useState(null);
-  const [isShow, setIsShow] = useState(true);
+  const [isShow, setIsShow] = useState(false);
+  const badgeDays = [5, 10, 20, 30, 60, 100, 150, 200, 250, 300, 365];
   useEffect(() => {
     const getDaysInStudy = async () => {
       if (user) {
@@ -29,6 +32,32 @@ export const Home = () => {
     getDailyActivity();
     getDaysInStudy();
   }, [user]);
+  useEffect(() => {
+    const updateBadge = async () => {
+      if (user && streak) {
+        if (badgeDays.includes(streak) || streak == 1) {
+          const badgesRef = ref(db, `emr-users/${user.uid}/progress/badges`);
+          const snapshot = await get(badgesRef);
+          const badges = snapshot.val() || {};
+          const myBadges = Object.entries(badges).map(([day, isGot]) => ({
+            day,
+            isGot,
+          }));
+          const target = myBadges.find((badge) => badge.day == streak);
+          if (!target && streak != 1) {
+            setIsShow(true);
+            const updateData = {
+              [streak]: true,
+            };
+            await update(badgesRef, updateData);
+          } else if (streak == 1) {
+            await set(badgesRef, null);
+          }
+        }
+      }
+    };
+    updateBadge();
+  }, [streak]);
   return (
     <>
       <div className="p-4 flex flex-col items-center h-full">
@@ -40,6 +69,26 @@ export const Home = () => {
         </div>
       </div>
       <Modal isShow={isShow} setIsShow={setIsShow}>
+        {badgeDays.includes(streak) && (
+          <div className="flex flex-col gap-8 items-center justify-center relative">
+            <p className="text-2xl font-bold text-center text-amber-500">
+              <p>Congratulations!</p>
+              <p>
+                You got a new <strong className="font-extrabold">Badge</strong>!
+              </p>
+            </p>
+            <div className="animate-bounce">
+              <StreakBadgesLightFixed
+                streakCount={streak}
+                isGot={true}
+                isNew={true}
+              />
+            </div>
+            <div className="absolute top-0 left-0 w-full h-full">
+              <Cracker />
+            </div>
+          </div>
+        )}
       </Modal>
     </>
   );

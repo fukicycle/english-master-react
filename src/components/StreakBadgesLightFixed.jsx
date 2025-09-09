@@ -14,12 +14,16 @@ const badgeList = [
   { days: 365, borderColor: "#FFD700" },
 ];
 
-export default function StreakBadgesLightFixed({ streakCount, isGot }) {
+export default function StreakBadgesLightFixed({
+  streakCount,
+  isGot,
+  isNew = false,
+}) {
   return (
     <div
-      className={`w-20 h-20 flex items-center justify-center relative transform transition-all duration-500 ${
+      className={`flex items-center justify-center relative transform transition-all duration-500 ${
         isGot ? "animate-pulse" : "animate-none"
-      }`}
+      } ${isNew ? "w-28 h-28" : "w-20 h-20"}`}
     >
       <svg width="100%" height="100%" viewBox="0 0 100 100">
         <defs>
