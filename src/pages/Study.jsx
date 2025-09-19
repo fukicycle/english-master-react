@@ -1,4 +1,4 @@
-import { get, ref, update } from "firebase/database";
+import { get, ref, set, update } from "firebase/database";
 import { useEffect, useState } from "react";
 import { db } from "../services/firebase";
 import {
@@ -68,7 +68,7 @@ export const Study = () => {
       const snapshot = await get(progressRepeatRef);
       const repeat = snapshot.val() || 0;
       const newRepeat = repeat + 1;
-      await update(progressRepeatRef, newRepeat);
+      await set(progressRepeatRef, newRepeat);
       setLevelWithRepeatNumber(newRepeat);
     } catch (e) {
       console.error(e);
