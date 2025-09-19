@@ -1,4 +1,5 @@
 import { useAuth } from "../contexts/AuthContext";
+import { useTheme } from "../contexts/ThemeContext";
 import StreakWidget from "../components/StreakWidget";
 import { useEffect, useState } from "react";
 import { get, ref, set, update } from "firebase/database";
@@ -7,6 +8,7 @@ import { checkLast7Days } from "../services/progress";
 import Modal from "../components/Modal";
 import StreakBadgesLightFixed from "../components/StreakBadgesLightFixed";
 import Cracker from "../components/Cracker";
+import { getLevelWithRepeatNumber } from "../services/level";
 
 export const Home = () => {
   const { user, loading } = useAuth();
@@ -14,6 +16,7 @@ export const Home = () => {
   const [dailyActivity, setDailyActivity] = useState(null);
   const [isShow, setIsShow] = useState(false);
   const badgeDays = [5, 10, 20, 30, 60, 100, 150, 200, 250, 300, 365];
+  const { theme, setTheme } = useTheme();
   useEffect(() => {
     const getDaysInStudy = async () => {
       if (user) {
@@ -23,12 +26,25 @@ export const Home = () => {
         setStreak(streak);
       }
     };
+    const getUserLevel = async () => {
+      if (user) {
+        let level = localStorage.getItem("level");
+        if (level) {
+          const repeatRef = ref(db, `emr-users/${user.uid}/progress/repeat`);
+          const snapshot = await get(repeatRef);
+          const repeat = snapshot.val() || 0;
+          level = getLevelWithRepeatNumber(repeat);
+        }
+        setTheme(level);
+      }
+    };
     const getDailyActivity = async () => {
       if (user) {
         const dailyAcitivity = await checkLast7Days(user.uid);
         setDailyActivity(dailyAcitivity);
       }
     };
+    getUserLevel();
     getDailyActivity();
     getDaysInStudy();
   }, [user]);
